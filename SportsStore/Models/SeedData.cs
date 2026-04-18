@@ -16,6 +16,7 @@ namespace SportsStore.Models
             }
 
             if (!context.Products.Any())
+
             {
                 context.Products.AddRange(                   
                     new Product {

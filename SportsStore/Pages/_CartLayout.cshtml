@@ -1,16 +1,105 @@
-﻿<!DOCTYPE html> 
-<html> 
-<head> 
-<meta name="viewport" content="width=device-width" />
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
     <title>SportsStore</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #161616;
+            --bg-hover: #1e1e1e;
+            --border-color: #222222;
+            --accent: #e8ff00;
+            --accent-dim: rgba(232, 255, 0, 0.08);
+            --text-primary: #f0f0f0;
+            --text-muted: #555555;
+            --text-secondary: #888888;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .site-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .brand::before {
+                content: '';
+                width: 8px;
+                height: 8px;
+                background: var(--accent);
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+        .site-main {
+            flex: 1;
+            padding: 3rem 2rem;
+        }
+
+        .site-footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+    </style>
 </head>
 <body>
-    <div class="bg-dark text-white p-2">
-        <span class="navbar-brand m1-2">SPORTS STORE</span>
-    </div>
-    <div class="m-1 p-1">
+    <header class="site-header">
+        <a class="brand" href="/">SPORTS STORE</a>
+    </header>
+    <main class="site-main">
         @RenderBody()
-    </div>
+    </main>
+    <footer class="site-footer">
+        <span>&copy; 2026 SPORTS STORE</span>
+    </footer>
 </body>
 </html>

@@ -1,11 +1,146 @@
-﻿@page 
-<div class="text-center"> 
-<h2>Thanks!</h2> 
-<p>Thanks for placing order #@OrderId</p>
-<p>We'll ship your goods as soon as possible.</p>
-<a class="btn btn-primary" asp-controller="Home">Return to Store</a>
-</div> 
-@functions { 
-[BindProperty(SupportsGet = true)] 
-public string? OrderId { get; set; } 
+﻿@page
+
+<style>
+    :root {
+        --bg-primary: #0a0a0a;
+        --bg-card: #161616;
+        --border-color: #222222;
+        --accent: #e8ff00;
+        --accent-dim: rgba(232, 255, 0, 0.08);
+        --text-primary: #f0f0f0;
+        --text-muted: #555555;
+        --text-secondary: #888888;
+    }
+
+    .confirm-wrapper {
+        max-width: 480px;
+        margin: 4rem auto;
+        text-align: center;
+    }
+
+    .confirm-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--accent-dim);
+        border: 1px solid rgba(232, 255, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.75rem;
+    }
+
+        .confirm-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--accent);
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .confirm-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .confirm-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .order-id-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .order-id-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.35rem;
+    }
+
+    .order-id-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 0.05em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .confirm-message {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        line-height: 1.7;
+    }
+
+    .btn-return {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        border: none;
+        color: #000;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+
+        .btn-return:hover {
+            background: #d4eb00;
+            color: #000;
+        }
+</style>
+
+<div class="confirm-wrapper">
+
+    <div class="confirm-icon">
+        <svg viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+
+    <h2 class="confirm-title">Order Confirmed</h2>
+    <p class="confirm-subtitle">Thank you for shopping with us.</p>
+
+    <div class="order-id-box">
+        <div class="order-id-label">Order Reference</div>
+        <div class="order-id-value">#@OrderId</div>
+    </div>
+
+    <p class="confirm-message">
+        We've received your order and will ship your items as soon as possible.<br>
+        You'll receive a confirmation shortly.
+    </p>
+
+    <a class="btn-return" asp-controller="Home">
+        &#8592; Return to Store
+    </a>
+
+</div>
+
+@functions {
+    [BindProperty(SupportsGet = true)]
+    public string? OrderId { get; set; }
 }

@@ -1,59 +1,297 @@
 ﻿@page
 @using static SportsStore.Models.Cart
 @model CartModel
-<h2>Your cart</h2>
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Quantity</th>
-            <th>Item</th>
-            <th class="text-right">Price</th>
-            <th class="text-right">Subtotal</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var line in Model.Cart?.Lines ?? Enumerable.Empty<CartLine>())
-        {
-            <tr>
-            <td class="text-center">@line.Quantity</td> 
-            <td class="text-left">@line.Product.Name</td> 
-            <td class="text-right"> 
-                @line.Product.Price.ToString("c") 
-            </td> 
-            <td class="text-right"> 
-                @((line.Quantity * line.Product.Price).ToString("c")) 
-            </td> 
-                <td class="text-center">
-                    <form asp-page-handler="Remove" method="post">
-                        <input type="hidden" name="ProductID"
-                               value="@line.Product.ProductID" />
-                        <input type="hidden" name="returnUrl"
-                               value="@Model?.ReturnUrl" />
-                        <button type="submit"
-                                class="btn btn-sm btn-danger">
-                            Remove
-                        </button>
-                    </form>
-                </td>
-            </tr>
+
+<style>
+    :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #111111;
+        --bg-card: #161616;
+        --bg-hover: #1e1e1e;
+        --border-color: #222222;
+        --accent: #e8ff00;
+        --accent-dim: rgba(232, 255, 0, 0.08);
+        --text-primary: #f0f0f0;
+        --text-muted: #555555;
+        --text-secondary: #888888;
+        --danger: #ff4444;
+        --danger-dim: rgba(255, 68, 68, 0.08);
+    }
+
+    .cart-wrapper {
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .cart-heading {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .cart-subheading {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-card);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+        .cart-table thead tr {
+            border-bottom: 1px solid var(--border-color);
         }
-    </tbody> 
-<tfoot> 
-        <tr> 
-            <td colspan="3" class="text-right">Total:</td>
-            <td class="text-right">
-                @Model.Cart?.ComputeTotalValue().ToString("c")
-            </td>
-        </tr>
-    </tfoot>
-</table>
-<div class="text-center">
-    <a class="btn btn-primary" href="@Model.ReturnUrl">
-        Continue shopping
-    </a>
-    <a class="btn btn-primary" asp-action="Checkout"
-       asp-controller="Order">
-        Checkout
-    </a>
+
+        .cart-table thead th {
+            padding: 0.9rem 1.25rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .cart-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.15s;
+        }
+
+            .cart-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .cart-table tbody tr:hover {
+                background: var(--bg-hover);
+            }
+
+        .cart-table td {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+    .qty-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+    }
+
+    .product-name {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .price-cell {
+        font-variant-numeric: tabular-nums;
+        color: var(--text-secondary);
+        text-align: right;
+    }
+
+    .subtotal-cell {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        color: var(--text-primary);
+        text-align: right;
+    }
+
+    .btn-remove {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        padding: 0.35rem 0.75rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-transform: uppercase;
+    }
+
+        .btn-remove:hover {
+            background: var(--danger-dim);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+    .cart-footer-row {
+        background: var(--bg-secondary) !important;
+        border-top: 1px solid var(--border-color) !important;
+    }
+
+        .cart-footer-row td {
+            padding: 1.1rem 1.25rem !important;
+            color: var(--text-muted) !important;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .cart-footer-row .total-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            letter-spacing: -0.02em;
+            text-align: right;
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-muted);
+    }
+
+        .empty-cart i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: #2a2a2a;
+        }
+
+    .cart-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.75rem;
+        gap: 1rem;
+    }
+
+    .btn-continue {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.65rem 1.25rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.15s;
+        letter-spacing: 0.03em;
+    }
+
+        .btn-continue:hover {
+            border-color: #333;
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+    .btn-checkout {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        border: 1px solid var(--accent);
+        color: #000;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.65rem 1.75rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+
+        .btn-checkout:hover {
+            background: #d4eb00;
+            border-color: #d4eb00;
+            color: #000;
+        }
+</style>
+
+<div class="cart-wrapper">
+    <h2 class="cart-heading">Your Cart</h2>
+    <p class="cart-subheading">Review your items before checkout</p>
+
+    @if (!(Model.Cart?.Lines.Any() ?? false))
+    {
+        <div class="empty-cart">
+            <i class="fa fa-shopping-cart"></i>
+            <p>Your cart is empty.</p>
+            <a class="btn-continue" href="@Model.ReturnUrl">
+                &#8592; Continue Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th style="text-align:center">Qty</th>
+                    <th>Item</th>
+                    <th style="text-align:right">Price</th>
+                    <th style="text-align:right">Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Model.Cart?.Lines ?? Enumerable.Empty<CartLine>())
+                {
+                    <tr>
+                        <td style="text-align:center">
+                            <span class="qty-badge">@line.Quantity</span>
+                        </td>
+                        <td>
+                            <span class="product-name">@line.Product.Name</span>
+                        </td>
+                        <td class="price-cell">
+                            @line.Product.Price.ToString("c")
+                        </td>
+                        <td class="subtotal-cell">
+                            @((line.Quantity * line.Product.Price).ToString("c"))
+                        </td>
+                        <td style="text-align:center">
+                            <form asp-page-handler="Remove" method="post">
+                                <input type="hidden" name="ProductID" value="@line.Product.ProductID" />
+                                <input type="hidden" name="returnUrl" value="@Model?.ReturnUrl" />
+                                <button type="submit" class="btn-remove">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="cart-footer-row">
+                    <td colspan="3">Total</td>
+                    <td class="total-amount">
+                        @Model.Cart?.ComputeTotalValue().ToString("c")
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="cart-actions">
+            <a class="btn-continue" href="@Model.ReturnUrl">
+                &#8592; Continue Shopping
+            </a>
+            <a class="btn-checkout" asp-action="Checkout" asp-controller="Order">
+                Checkout &#8594;
+            </a>
+        </div>
+    }
 </div>
